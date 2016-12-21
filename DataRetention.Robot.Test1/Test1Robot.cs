@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using DataRetention.Core.DataEntities;
 using DataRetention.Core.Infrastructure;
 using DataRetention.Robot.Core;
@@ -8,14 +11,16 @@ namespace DataRetention.Robot.Test1
     public class Test1Robot
     {
         private readonly string _robotId;
+        private readonly int _robotVersion;
         private readonly ITaskServer _taskServer;
         private readonly IStagingServer _stagingServer;
         private readonly IEntity1Provider _entity1Provider;
         private readonly IEntity2Provider _entity2Provider;
 
-        public Test1Robot(string robotId, ITaskServer taskServer, IStagingServer stagingServer, IEntity1Provider entity1Provider, IEntity2Provider entity2Provider)
+        public Test1Robot(string robotId, int robotVersion, ITaskServer taskServer, IStagingServer stagingServer, IEntity1Provider entity1Provider, IEntity2Provider entity2Provider)
         {
             _robotId = robotId;
+            _robotVersion = robotVersion;
             _taskServer = taskServer;
             _stagingServer = stagingServer;
             _entity1Provider = entity1Provider;
@@ -101,15 +106,20 @@ namespace DataRetention.Robot.Test1
         {
             var results = new RobotDiagnostics();
 
-            results.ServerName = System.Net.Dns.GetHostName();
+            // gather data about the current hosting machine
+            results.ServerName = Dns.GetHostName();
             results.ServerPath = System.Reflection.Assembly.GetEntryAssembly().Location;
+            var host = Dns.GetHostEntry(results.ServerName);
+            results.ServerIPAddress = host.AddressList.FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork);
 
+            // ping the connectivity of the remote services and providers
             results.TaskServerHealth = _taskServer.TestHealth();
             results.StagingServerHealth = _stagingServer.TestHealth();
             if (_entity1Provider != null)
                 results.Entity1ProviderHealth = _entity1Provider.TestHealth();
             if (_entity2Provider != null)
                 results.Entity2ProviderHealth = _entity2Provider.TestHealth();
+
             return results;
         }
 
@@ -174,9 +184,15 @@ namespace DataRetention.Robot.Test1
             }
         }
 
-        private bool StageDataFromProvider<T>(NewTaskRunResult taskParameters, IDataProvider<T> dataProvider)
+        private bool StageDataFromProvider(NewTaskRunResult taskParameters, IEntity1Provider dataProvider)
         {
-            QueryResult<Entity1> queryResult = _entity1Provider.Query(taskParameters.DateFrom, taskParameters.DateTo);
+            if (StagingDisabled)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Staging is disabled for datatype: {0}. Query results displayed below...", dataProvider.DataType.Name);
+            }
+
+            QueryResult<Entity1> queryResult = dataProvider.Query(taskParameters.DateFrom, taskParameters.DateTo);
             if (!queryResult.QuerySuccess)
             {
                 // something went wrong performing the query - inform the task server and abort
@@ -187,13 +203,59 @@ namespace DataRetention.Robot.Test1
 
             foreach (var data in queryResult.Data)
             {
-                ActionResponse response = _stagingServer.Load(taskParameters.SessionId, data);
-                if (!response.Success)
+                if (StagingDisabled)
                 {
-                    // something went wrong staging the data object - inform the task server and abort
-                    string errorMessage = string.Format("Error staging '{0}' object: {1}", dataProvider.DataType.Name, response.Message);
-                    AbortSession(taskParameters.SessionId, errorMessage);
-                    return false;
+                    Console.WriteLine("   - {0}", dataProvider.FriendlyDisplay(data));
+                }
+                else
+                {
+                    ActionResponse response = _stagingServer.Load(taskParameters.SessionId, data);
+                    if (!response.Success)
+                    {
+                        // something went wrong staging the data object - inform the task server and abort
+                        string errorMessage = string.Format("Error staging '{0}' object: {1}", dataProvider.DataType.Name, response.Message);
+                        AbortSession(taskParameters.SessionId, errorMessage);
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private bool StageDataFromProvider(NewTaskRunResult taskParameters, IEntity2Provider dataProvider)
+        {
+            if (StagingDisabled)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Staging is disabled for datatype: {0}. Query results displayed below...", dataProvider.DataType.Name);
+            }
+
+            QueryResult<Entity2> queryResult = dataProvider.Query(taskParameters.DateFrom, taskParameters.DateTo);
+            if (!queryResult.QuerySuccess)
+            {
+                // something went wrong performing the query - inform the task server and abort
+                string errorMessage = string.Format("Error staging '{0}' object: {1}", dataProvider.DataType.Name, queryResult.Message);
+                AbortSession(taskParameters.SessionId, errorMessage);
+                return false;
+            }
+
+            foreach (var data in queryResult.Data)
+            {
+                if (StagingDisabled)
+                {
+                    Console.WriteLine("   - {0}", dataProvider.FriendlyDisplay(data));
+                }
+                else
+                {
+                    ActionResponse response = _stagingServer.Load(taskParameters.SessionId, data);
+                    if (!response.Success)
+                    {
+                        // something went wrong staging the data object - inform the task server and abort
+                        string errorMessage = string.Format("Error staging '{0}' object: {1}", dataProvider.DataType.Name, response.Message);
+                        AbortSession(taskParameters.SessionId, errorMessage);
+                        return false;
+                    }
                 }
             }
 
@@ -210,15 +272,21 @@ namespace DataRetention.Robot.Test1
 
         private void OutputDiagnostics(RobotDiagnostics diagnostics)
         {
+            Console.WriteLine("======================================================================");
             Console.WriteLine("Robot Diagnostics :");
-            Console.WriteLine("============================================");
-            Console.WriteLine("  Server Name    : {0}", diagnostics.ServerName);
-            Console.WriteLine("  Server Path    : {0}", diagnostics.ServerPath);
-            Console.WriteLine("  Remote Health  : {0}", diagnostics.AllProvidersHealthy ? "All Ok" : "Fail");
-            Console.WriteLine("                 : {0} -> {1}", "Task Server", diagnostics.TaskServerHealth.Success ? "Ok" : "Fail");
-            Console.WriteLine("                 : {0} -> {1}", "Staging Server", diagnostics.StagingServerHealth.Success ? "Ok" : "Fail");
-            Console.WriteLine("                 : {0} -> {1}", _entity1Provider.DataType.Name, diagnostics.Entity1ProviderHealth.Success ? "Ok" : "Fail");
-            Console.WriteLine("                 : {0} -> {1}", _entity2Provider.DataType.Name, diagnostics.Entity1ProviderHealth.Success ? "Ok" : "Fail");
+            Console.WriteLine("======================================================================");
+            Console.WriteLine("   Robot Id       : {0}", _robotId);
+            Console.WriteLine("   Robot Version  : {0}", _robotVersion);
+            Console.WriteLine("   Server Name    : {0}", diagnostics.ServerName);
+            Console.WriteLine("   Server IP      : {0}", diagnostics.ServerIPAddress);
+            Console.WriteLine("   Server Path    : {0}", diagnostics.ServerPath);
+            Console.WriteLine("   Remote Health  : {0}", diagnostics.AllProvidersHealthy ? "All Ok" : "Fail");
+            Console.WriteLine("                  : {0} -> {1}", "Task Server", diagnostics.TaskServerHealth.Success ? "Ok" : "Fail");
+            Console.WriteLine("                  : {0} -> {1}", "Staging Server", diagnostics.StagingServerHealth.Success ? "Ok" : "Fail");
+            Console.WriteLine("                  : {0} -> {1}", _entity1Provider.DataType.Name, diagnostics.Entity1ProviderHealth.Success ? "Ok" : "Fail");
+            Console.WriteLine("                  : {0} -> {1}", _entity2Provider.DataType.Name, diagnostics.Entity1ProviderHealth.Success ? "Ok" : "Fail");
+            Console.WriteLine("======================================================================");
+            Console.WriteLine();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace DataRetention.Core.Infrastructure
+﻿using System.Net;
+
+namespace DataRetention.Core.Infrastructure
 {
     public class HealthTestResult
     {
@@ -21,6 +23,11 @@
         /// Path of the robot executable
         /// </summary>
         public string ServerPath { get; set; }
+
+        /// <summary>
+        /// IP Address of the server hosting the robot
+        /// </summary>
+        public IPAddress ServerIPAddress { get; set; }
 
         /// <summary>
         /// Health reported as Ok for the staging server and all available data providers

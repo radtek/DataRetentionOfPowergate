@@ -22,6 +22,11 @@ namespace DataRetention.Robot.Test1
             return new ActionResponse {Success = true};
         }
 
+        public ActionResponse Load(string sessionId, Entity2 data)
+        {
+            return new ActionResponse { Success = true };
+        }
+
         public ActionResponse Abort(string sessionId)
         {
             return new ActionResponse { Success = true };

@@ -24,6 +24,14 @@ namespace DataRetention.Core.Infrastructure
         ActionResponse Load(string sessionId, Entity1 data);
 
         /// <summary>
+        /// Stage a data object against a session
+        /// </summary>
+        /// <param name="sessionId"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        ActionResponse Load(string sessionId, Entity2 data);
+
+        /// <summary>
         /// Abort a session.  All staged data will be rolled back
         /// </summary>
         /// <param name="sessionId"></param>

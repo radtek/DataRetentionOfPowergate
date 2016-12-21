@@ -46,6 +46,11 @@ namespace DataRetention.Robot.Test1
         {
             return Query(dateFrom, dateTo);
         }
+
+        public string FriendlyDisplay(Entity1 data)
+        {
+            return string.Format("Field1: '{0}', Field2: '{1}'", data.Field1, data.Field2);
+        }
     }
 
     public class DummyEntity2Provider : IEntity2Provider
@@ -87,6 +92,11 @@ namespace DataRetention.Robot.Test1
         public QueryResult<Entity2> Query(DateTime dateFrom, DateTime dateTo, int maxCount)
         {
             return Query(dateFrom, dateTo);
+        }
+
+        public string FriendlyDisplay(Entity2 data)
+        {
+            return string.Format("Field1: '{0}', Field2: '{1}'", data.Field1, data.Field2);
         }
     }
 

@@ -16,5 +16,10 @@ namespace DataRetention.Robot.Core
         //QueryResult<T> Query(Instant from, Instant to, int maxCount);
         QueryResult<T> Query(DateTime dateFrom, DateTime dateTo);
         QueryResult<T> Query(DateTime dateFrom, DateTime dateTo, int maxCount);
+
+        /// <summary>
+        /// Human friendly
+        /// </summary>
+        string FriendlyDisplay(T data);
     }
 }
