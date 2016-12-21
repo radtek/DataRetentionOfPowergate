@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using DataRetention.Core.DataEntities;
 using DataRetention.Core.Infrastructure;
 using DataRetention.Robot.Core;
@@ -12,7 +10,6 @@ namespace DataRetention.Robot.Test1
         private readonly string _robotId;
         private readonly ITaskServer _taskServer;
         private readonly IStagingServer _stagingServer;
-
         private readonly IEntity1Provider _entity1Provider;
         private readonly IEntity2Provider _entity2Provider;
 
@@ -41,10 +38,37 @@ namespace DataRetention.Robot.Test1
                 throw new ArgumentNullException("entity2Provider", "Robot created with no provider for Entity2 data");
         }
 
+        public bool Verbose { get; set; }
+        public bool HealthCheckOnly { get; set; }
+        public bool StagingDisabled { get; set; }
+
         public void Start()
         {
+            VerboseOutput(" * Verbose mode selected.");
+
+            if (StagingDisabled)
+            {
+                VerboseOutput(" * Pretend mode selected (no data will be staged).");
+            }
+
+            if (HealthCheckOnly)
+            {
+                VerboseOutput(" * Health check only.");
+            }
+
+
             // Test connectivity of all providers and staging server
-            RobotDiagnostics robotDiagnostics = PerformAllHealthTests();
+            RobotDiagnostics robotDiagnostics = PerformDiagnostics();
+            if (Verbose || HealthCheckOnly)
+            {
+                OutputDiagnostics(robotDiagnostics);
+            }
+
+            if (HealthCheckOnly)
+            {
+                VerboseOutput("Health check completed.  Exiting.");
+                return;
+            }
 
             // Connect to task server and :
             //   - report systems connectivity
@@ -73,9 +97,14 @@ namespace DataRetention.Robot.Test1
             Run(requestNewTaskRunResult.Response);
         }
 
-        private RobotDiagnostics PerformAllHealthTests()
+        private RobotDiagnostics PerformDiagnostics()
         {
             var results = new RobotDiagnostics();
+
+            results.ServerName = System.Net.Dns.GetHostName();
+            results.ServerPath = System.Reflection.Assembly.GetEntryAssembly().Location;
+
+            results.TaskServerHealth = _taskServer.TestHealth();
             results.StagingServerHealth = _stagingServer.TestHealth();
             if (_entity1Provider != null)
                 results.Entity1ProviderHealth = _entity1Provider.TestHealth();
@@ -169,6 +198,27 @@ namespace DataRetention.Robot.Test1
             }
 
             return true;
+        }
+
+        private void VerboseOutput(string line)
+        {
+            if (Verbose)
+            {
+                Console.WriteLine(line);
+            }
+        }
+
+        private void OutputDiagnostics(RobotDiagnostics diagnostics)
+        {
+            Console.WriteLine("Robot Diagnostics :");
+            Console.WriteLine("============================================");
+            Console.WriteLine("  Server Name    : {0}", diagnostics.ServerName);
+            Console.WriteLine("  Server Path    : {0}", diagnostics.ServerPath);
+            Console.WriteLine("  Remote Health  : {0}", diagnostics.AllProvidersHealthy ? "All Ok" : "Fail");
+            Console.WriteLine("                 : {0} -> {1}", "Task Server", diagnostics.TaskServerHealth.Success ? "Ok" : "Fail");
+            Console.WriteLine("                 : {0} -> {1}", "Staging Server", diagnostics.StagingServerHealth.Success ? "Ok" : "Fail");
+            Console.WriteLine("                 : {0} -> {1}", _entity1Provider.DataType.Name, diagnostics.Entity1ProviderHealth.Success ? "Ok" : "Fail");
+            Console.WriteLine("                 : {0} -> {1}", _entity2Provider.DataType.Name, diagnostics.Entity1ProviderHealth.Success ? "Ok" : "Fail");
         }
     }
 }

@@ -15,12 +15,12 @@
         /// <summary>
         /// The name of the server hosting the robot
         /// </summary>
-        public string ServerLocation { get; set; }
+        public string ServerName { get; set; }
 
         /// <summary>
         /// Path of the robot executable
         /// </summary>
-        public string Path { get; set; }
+        public string ServerPath { get; set; }
 
         /// <summary>
         /// Health reported as Ok for the staging server and all available data providers
@@ -33,12 +33,15 @@
                     return false;
                 if (Entity2ProviderHealth != null && Entity2ProviderHealth.Success == false)
                     return false;
+                if (TaskServerHealth == null || TaskServerHealth.Success == false)
+                    return false;
                 return StagingServerHealth != null && StagingServerHealth.Success;
             }
         }
 
+        public HealthTestResult TaskServerHealth { get; set; }
+        public HealthTestResult StagingServerHealth { get; set; }
         public HealthTestResult Entity1ProviderHealth { get; set; }
         public HealthTestResult Entity2ProviderHealth { get; set; }
-        public HealthTestResult StagingServerHealth { get; set; }
     }
 }
