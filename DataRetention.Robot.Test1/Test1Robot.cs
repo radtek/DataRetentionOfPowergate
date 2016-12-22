@@ -17,6 +17,8 @@ namespace DataRetention.Robot.Test1
         private readonly IEntity1Provider _entity1Provider;
         private readonly IEntity2Provider _entity2Provider;
 
+        private RobotDiagnostics _robotDiagnostics;
+
         public Test1Robot(string robotId, ITaskServer taskServer, IStagingServer stagingServer, IEntity1Provider entity1Provider, IEntity2Provider entity2Provider)
         {
             _robotId = robotId;
@@ -24,6 +26,8 @@ namespace DataRetention.Robot.Test1
             _stagingServer = stagingServer;
             _entity1Provider = entity1Provider;
             _entity2Provider = entity2Provider;
+
+            // sanity check on critical resources...
 
             if (string.IsNullOrWhiteSpace(_robotId))
                 throw new ArgumentNullException("robotId", "Robot created with no Id!");
@@ -42,12 +46,15 @@ namespace DataRetention.Robot.Test1
                 throw new ArgumentNullException("entity2Provider", "Robot created with no provider for Entity2 data");
         }
 
+        // options
         public bool Verbose { get; set; }
         public bool HealthCheckOnly { get; set; }
         public bool StagingDisabled { get; set; }
 
-        private RobotDiagnostics _robotDiagnostics;
-
+        /// <summary>
+        /// Begin processing the robot
+        /// </summary>
+        /// <returns></returns>
         public bool Start()
         {
             VerboseOutput(" * Verbose mode selected.");
@@ -105,6 +112,11 @@ namespace DataRetention.Robot.Test1
             return PerformTask(requestNewTaskRunResult.Response);
         }
 
+        /// <summary>
+        /// Gather important information of the currently running program.
+        /// Also determine which systems we can connect to correctly
+        /// </summary>
+        /// <returns></returns>
         private RobotDiagnostics PerformDiagnostics()
         {
             var results = new RobotDiagnostics();
@@ -126,6 +138,11 @@ namespace DataRetention.Robot.Test1
             return results;
         }
 
+        /// <summary>
+        /// Perform the actual task of gathering and staging new data
+        /// </summary>
+        /// <param name="taskParameters"></param>
+        /// <returns></returns>
         private bool PerformTask(NewTaskRunResult taskParameters)
         {
             // tell the task server that we're starting the run
