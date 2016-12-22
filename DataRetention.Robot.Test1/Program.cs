@@ -1,23 +1,27 @@
 ﻿using System;
-using System.Net.Mail;
 using DataRetention.Core.Infrastructure;
 using DataRetention.Robot.Core;
+using log4net;
+using log4net.Config;
 
+[assembly: XmlConfigurator(Watch = true)]
 namespace DataRetention.Robot.Test1
 {
     internal class Program
     {
+        private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private static ITaskServer _taskServer;
         private static IStagingServer _stagingServer;
         private static IEntity1Provider _entity1Provider;
         private static IEntity2Provider _entity2Provider;
 
-        // note that logging needs to be added.  Probably would recommend Log4net - but use whatever you're comfortable with
-
         private static int Main(string[] args)
         {
             try
             {
+                Log.Info("Robot starting");
+
                 if (!ConfigOptions.ParseCommandLine(args))
                 {
                     Console.WriteLine("Unknown command line params.  Exiting...");
@@ -41,7 +45,11 @@ namespace DataRetention.Robot.Test1
                 robot.StagingDisabled = ConfigOptions.StagingDisabled;
 
                 // Set the robot running
-                robot.Start();
+                if (!robot.Start())
+                {
+                    Environment.ExitCode = 1;
+                    return 1;
+                }
             }
             catch (Exception e)
             {
@@ -65,9 +73,13 @@ namespace DataRetention.Robot.Test1
 
         private static void CreateProductionProviders()
         {
+            Log.Debug("creating task server");
             _taskServer = new DummyTaskServer(ConfigOptions.RobotId);
+            Log.Debug("creating staging server");
             _stagingServer = new DummyStagingServer(ConfigOptions.RobotId);
+            Log.Debug("creating provider for Entity1");
             _entity1Provider = new DummyEntity1Provider();
+            Log.Debug("creating provider for Entity2");
             _entity2Provider = new DummyEntity2Provider();
         }
     }
