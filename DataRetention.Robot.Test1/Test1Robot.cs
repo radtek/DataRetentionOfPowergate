@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using DataRetention.Core.DataEntities;
 using DataRetention.Core.Infrastructure;
 using DataRetention.Robot.Core;
@@ -11,16 +12,14 @@ namespace DataRetention.Robot.Test1
     public class Test1Robot
     {
         private readonly string _robotId;
-        private readonly int _robotVersion;
         private readonly ITaskServer _taskServer;
         private readonly IStagingServer _stagingServer;
         private readonly IEntity1Provider _entity1Provider;
         private readonly IEntity2Provider _entity2Provider;
 
-        public Test1Robot(string robotId, int robotVersion, ITaskServer taskServer, IStagingServer stagingServer, IEntity1Provider entity1Provider, IEntity2Provider entity2Provider)
+        public Test1Robot(string robotId, ITaskServer taskServer, IStagingServer stagingServer, IEntity1Provider entity1Provider, IEntity2Provider entity2Provider)
         {
             _robotId = robotId;
-            _robotVersion = robotVersion;
             _taskServer = taskServer;
             _stagingServer = stagingServer;
             _entity1Provider = entity1Provider;
@@ -47,7 +46,9 @@ namespace DataRetention.Robot.Test1
         public bool HealthCheckOnly { get; set; }
         public bool StagingDisabled { get; set; }
 
-        public void Start()
+        private RobotDiagnostics _robotDiagnostics;
+
+        public bool Start()
         {
             VerboseOutput(" * Verbose mode selected.");
 
@@ -63,43 +64,45 @@ namespace DataRetention.Robot.Test1
 
 
             // Test connectivity of all providers and staging server
-            RobotDiagnostics robotDiagnostics = PerformDiagnostics();
+            _robotDiagnostics = PerformDiagnostics();
             if (Verbose || HealthCheckOnly)
             {
-                OutputDiagnostics(robotDiagnostics);
+                Console.WriteLine(FormatDiagnosticsMessage(_robotDiagnostics));
             }
 
             if (HealthCheckOnly)
             {
                 VerboseOutput("Health check completed.  Exiting.");
-                return;
+                return true;
             }
 
             // Connect to task server and :
             //   - report systems connectivity
             //   - ask server if a new run is required (along with parameters for run)
             // (on error, send error notification and abort)
-            ActionResponse actionResponse = _taskServer.ReportRobotHealth(robotDiagnostics);
+            ActionResponse actionResponse = _taskServer.ReportRobotHealth(_robotDiagnostics);
             if (!actionResponse.Success)
             {
                 // We failed connecting to the task server!!!!!  Need to fall back to manually alerting someone...
-                throw new NotImplementedException("This functionality is not yet implemented.  We need to alert developers/admin of a problem (via email?)");
+                SendErrorEmail("Error", "Failed reporting Robot health to task server! " + actionResponse.Message);
+                return false;
             }
 
             ActionResponse<NewTaskRunResult> requestNewTaskRunResult = _taskServer.RequestNewTaskRun();
             if (!requestNewTaskRunResult.Success)
             {
                 // We failed connecting to the task server!!!!!  Need to fall back to manually alerting someone...
-                throw new NotImplementedException("This functionality is not yet implemented.  We need to alert developers/admin of a problem (via email?)");
+                SendErrorEmail("Error", "Failed requesting new task run with task server! " + requestNewTaskRunResult.Message);
+                return false;
             }
 
             if (!requestNewTaskRunResult.Response.RunRequired)
             {
                 // The task server has told us we don't need to run.  Nothing left to do.
-                return;
+                return true;
             }
 
-            Run(requestNewTaskRunResult.Response);
+            return PerformTask(requestNewTaskRunResult.Response);
         }
 
         private RobotDiagnostics PerformDiagnostics()
@@ -123,43 +126,45 @@ namespace DataRetention.Robot.Test1
             return results;
         }
 
-        private void Run(NewTaskRunResult taskParameters)
+        private bool PerformTask(NewTaskRunResult taskParameters)
         {
             // tell the task server that we're starting the run
             ActionResponse actionResponse = _taskServer.Starting(taskParameters.SessionId);
             if (!actionResponse.Success)
             {
                 // The call to the task server failed!!!!!  Need to fall back to manually alerting someone...
-                throw new NotImplementedException("This functionality is not yet implemented.  We need to alert developers/admin of a problem (via email?)");
+                SendErrorEmail("Error", "Failed starting task! " + actionResponse.Message);
+                return false;
             }
 
             // Iterate through all data types we have (in appropriate order) and
             if (!StageDataFromProvider(taskParameters, _entity1Provider))
             {
-                return;
+                return false;
             }
 
             if (!StageDataFromProvider(taskParameters, _entity2Provider))
             {
-                return;
+                return false;
             }
 
             // When done, commit the staging server data set
             actionResponse = _stagingServer.Commit(taskParameters.SessionId);
             if (!actionResponse.Success)
             {
-                // Committing the data on the staging server failed!!!!!  Need to fall back to manually alerting someone...
                 AbortSession(taskParameters.SessionId, "Error committing staged data: " + actionResponse.Message);
-                return;
+                return false;
             }
 
             actionResponse = _taskServer.Completed(taskParameters.SessionId);
             if (!actionResponse.Success)
             {
                 // Completing the session on the task server failed!!!!!  Need to fall back to manually alerting someone...
-                throw new NotImplementedException("This functionality is not yet implemented.  We need to alert developers/admin of a problem (via email?)");
-                return;
+                SendErrorEmail("Error", "Failed completing task! " + actionResponse.Message);
+                return false;
             }
+
+            return true;
         }
 
         /// <summary>
@@ -172,15 +177,13 @@ namespace DataRetention.Robot.Test1
             ActionResponse actionResponse = _taskServer.Error(sessionId, errorMessage);
             if (!actionResponse.Success)
             {
-                // Even the call to tell the task server about the error failed!!!!!  Need to fall back to manually alerting someone...
-                throw new NotImplementedException("This functionality is not yet implemented.  We need to alert developers/admin of a problem (via email?)");
+                SendErrorEmail("Error", "Failed notifying task server of error on session #" + sessionId + ". " + actionResponse.Message);
             }
 
             actionResponse = _stagingServer.Abort(sessionId);
             if (!actionResponse.Success)
             {
-                // The call to abort the session on the staging server failed!!!!!  Need to fall back to manually alerting someone...
-                throw new NotImplementedException("This functionality is not yet implemented.  We need to alert developers/admin of a problem (via email?)");
+                SendErrorEmail("Error", "Failed aborting session #" + sessionId + " on staging server! " + actionResponse.Message);
             }
         }
 
@@ -270,23 +273,35 @@ namespace DataRetention.Robot.Test1
             }
         }
 
-        private void OutputDiagnostics(RobotDiagnostics diagnostics)
+        private string FormatDiagnosticsMessage(RobotDiagnostics diagnostics)
         {
-            Console.WriteLine("======================================================================");
-            Console.WriteLine("Robot Diagnostics :");
-            Console.WriteLine("======================================================================");
-            Console.WriteLine("   Robot Id       : {0}", _robotId);
-            Console.WriteLine("   Robot Version  : {0}", _robotVersion);
-            Console.WriteLine("   Server Name    : {0}", diagnostics.ServerName);
-            Console.WriteLine("   Server IP      : {0}", diagnostics.ServerIPAddress);
-            Console.WriteLine("   Server Path    : {0}", diagnostics.ServerPath);
-            Console.WriteLine("   Remote Health  : {0}", diagnostics.AllProvidersHealthy ? "All Ok" : "Fail");
-            Console.WriteLine("                  : {0} -> {1}", "Task Server", diagnostics.TaskServerHealth.Success ? "Ok" : "Fail");
-            Console.WriteLine("                  : {0} -> {1}", "Staging Server", diagnostics.StagingServerHealth.Success ? "Ok" : "Fail");
-            Console.WriteLine("                  : {0} -> {1}", _entity1Provider.DataType.Name, diagnostics.Entity1ProviderHealth.Success ? "Ok" : "Fail");
-            Console.WriteLine("                  : {0} -> {1}", _entity2Provider.DataType.Name, diagnostics.Entity1ProviderHealth.Success ? "Ok" : "Fail");
-            Console.WriteLine("======================================================================");
-            Console.WriteLine();
+            var sb = new StringBuilder();
+            sb.AppendFormat("======================================================================").AppendLine();
+            sb.AppendFormat("Robot Diagnostics :").AppendLine();
+            sb.AppendFormat("======================================================================").AppendLine();
+            sb.AppendFormat("   Robot Id       : {0}", _robotId).AppendLine();
+            sb.AppendFormat("   Server Name    : {0}", diagnostics.ServerName).AppendLine();
+            sb.AppendFormat("   Server IP      : {0}", diagnostics.ServerIPAddress).AppendLine();
+            sb.AppendFormat("   Server Path    : {0}", diagnostics.ServerPath).AppendLine();
+            sb.AppendFormat("   Remote Health  : {0}", diagnostics.AllProvidersHealthy ? "All Ok" : "Fail").AppendLine();
+            sb.AppendFormat("                  : {0} -> {1}", "Task Server", diagnostics.TaskServerHealth.Success ? "Ok" : "Fail").AppendLine();
+            sb.AppendFormat("                  : {0} -> {1}", "Staging Server", diagnostics.StagingServerHealth.Success ? "Ok" : "Fail").AppendLine();
+            sb.AppendFormat("                  : {0} -> {1}", _entity1Provider.DataType.Name, diagnostics.Entity1ProviderHealth.Success ? "Ok" : "Fail").AppendLine();
+            sb.AppendFormat("                  : {0} -> {1}", _entity2Provider.DataType.Name, diagnostics.Entity1ProviderHealth.Success ? "Ok" : "Fail").AppendLine();
+            sb.AppendFormat("======================================================================").AppendLine();
+            return sb.ToString();
+        }
+
+        private void SendErrorEmail(string subject, string message)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine(message);
+            if (_robotDiagnostics != null)
+            {
+                sb.AppendLine();
+                sb.AppendLine(FormatDiagnosticsMessage(_robotDiagnostics));
+            }
+            MailFunctions.SendErrorEmail("DataRetentionRobot " + ConfigOptions.RobotId + " : " + subject, sb.ToString());
         }
     }
 }

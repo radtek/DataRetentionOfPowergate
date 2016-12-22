@@ -4,55 +4,66 @@ using CommandLine.Text;
 
 namespace DataRetention.Robot.Test1
 {
-    public class ConfigOptions
+    public static class ConfigOptions
     {
         #region App.Config Options
 
-        public string TaskServerApiUrlProduction
-        {
-            get { return ConfigurationManager.AppSettings["TaskServerApiUrl"]; }
-        }
+        public static string RobotId { get { return ConfigurationManager.AppSettings["RobotId"]; } }
 
-        public string StagingServerConnectionStringProduction
-        {
-            get { return ConfigurationManager.AppSettings["StagingServerConnectionString"]; }
-        }
+        public static string EmailErrorsTo { get { return ConfigurationManager.AppSettings["EmailErrorsTo"]; } }
 
-        public string TaskServerApiUrlTesting
-        {
-            get { return ConfigurationManager.AppSettings["TaskServerApiUrl-Testing"]; }
-        }
-
-        public string StagingServerConnectionStringTesting
-        {
-            get { return ConfigurationManager.AppSettings["StagingServerConnectionString-Testing"]; }
-        }
+        public static string EmailErrorsFrom { get { return ConfigurationManager.AppSettings["EmailErrorsFrom"]; } }
 
         #endregion
 
         #region Command Line Options
 
-        public bool ParseCommandLine(string[] args)
+        private class CommandLineOptions
         {
-            return Parser.Default.ParseArguments(args, this);
+            [Option("health", Required = false, DefaultValue = false, HelpText = "Display robot connectivity and health.")]
+            public bool HealthCheck
+            {
+                get { return ConfigOptions.HealthCheck; }
+                set { ConfigOptions.HealthCheck = value; }
+            }
+
+            [Option("nostaging", Required = false, DefaultValue = false, HelpText = "Do not stage data. Only output what data would be staged.")]
+            public bool StagingDisabled
+            {
+                get { return ConfigOptions.StagingDisabled; }
+                set { ConfigOptions.StagingDisabled = value; }
+            }
+
+            [Option('v', "verbose", Required = false, DefaultValue = false, HelpText = "Display verbose output to console.")]
+            public bool Verbose
+            {
+                get { return ConfigOptions.Verbose; }
+                set { ConfigOptions.Verbose = value; }
+            }
+
+            [HelpOption]
+            public string GetUsage()
+            {
+                return HelpText.AutoBuild(this, (HelpText current) => HelpText.DefaultParsingErrorsHandler(this, current));
+            }
         }
 
-        [Option("environment", Required = false, DefaultValue = "production", HelpText = "Connection strings to use (production|testing).")]
-        public string Environment { get; set; }
-
-        [Option("health", Required = false, DefaultValue = false, HelpText = "Display robot connectivity and health.")]
-        public bool HealthCheck { get; set; }
-
-        [Option("nostaging", Required = false, DefaultValue = false, HelpText = "Do not stage data. Only output what data would be staged.")]
-        public bool StagingDisabled { get; set; }
-
-        [Option('v', "verbose", Required = false, DefaultValue = false, HelpText = "Display verbose output to console.")]
-        public bool Verbose { get; set; }
-
-        [HelpOption]
-        public string GetUsage()
+        public static bool ParseCommandLine(string[] args)
         {
-            return HelpText.AutoBuild(this, (HelpText current) => HelpText.DefaultParsingErrorsHandler(this, current));
+            var options = new CommandLineOptions();
+            return Parser.Default.ParseArguments(args, options);
+        }
+
+        public static bool HealthCheck { get; set; }
+
+        public static bool StagingDisabled { get; set; }
+
+        public static bool Verbose { get; set; }
+
+        public static string GetUsage()
+        {
+            var options = new CommandLineOptions();
+            return options.GetUsage();
         }
 
         #endregion

@@ -1,35 +1,32 @@
 ﻿using System;
-using CommandLine;
-using CommandLine.Text;
+using System.Net.Mail;
 using DataRetention.Core.Infrastructure;
 using DataRetention.Robot.Core;
-using System.Configuration;
 
 namespace DataRetention.Robot.Test1
 {
-    class Program
+    internal class Program
     {
-        private const string RobotId = "TestRobot1";
-        private const int RobotVersion = 1;
-
         private static ITaskServer _taskServer;
         private static IStagingServer _stagingServer;
         private static IEntity1Provider _entity1Provider;
         private static IEntity2Provider _entity2Provider;
 
-
         // note that logging needs to be added.  Probably would recommend Log4net - but use whatever you're comfortable with
 
-
-        static int Main(string[] args)
+        private static int Main(string[] args)
         {
             try
             {
-                // Parse command line arguments - and construct options
-                var configOptions = new ConfigOptions();
-                if (!configOptions.ParseCommandLine(args))
+                if (!ConfigOptions.ParseCommandLine(args))
                 {
                     Console.WriteLine("Unknown command line params.  Exiting...");
+
+                    // todo: log this!
+
+                    MailFunctions.SendErrorEmail("DataRetentionRobot " + ConfigOptions.RobotId + " Error", "Bad command line arguments passed");
+                        // todo - put the list of args into the email body
+
                     Environment.ExitCode = 1;
                     return 1;
                 }
@@ -38,12 +35,10 @@ namespace DataRetention.Robot.Test1
                 CreateProductionProviders();
 
                 // Create the robot
-                var robot = new Test1Robot(RobotId, RobotVersion, _taskServer, _stagingServer, _entity1Provider, _entity2Provider);
-
-                // Set any robot options (using the config file or command line options)
-                robot.Verbose = configOptions.Verbose;
-                robot.HealthCheckOnly = configOptions.HealthCheck;
-                robot.StagingDisabled = configOptions.StagingDisabled;
+                var robot = new Test1Robot(ConfigOptions.RobotId, _taskServer, _stagingServer, _entity1Provider, _entity2Provider);
+                robot.Verbose = ConfigOptions.Verbose;
+                robot.HealthCheckOnly = ConfigOptions.HealthCheck;
+                robot.StagingDisabled = ConfigOptions.StagingDisabled;
 
                 // Set the robot running
                 robot.Start();
@@ -52,9 +47,13 @@ namespace DataRetention.Robot.Test1
             {
                 // log this!!!!!
 
-                // email/notify the devs!!!!
-
                 Console.WriteLine("Unhandled exception!!!! {0}", e.Message);
+
+                // email/notify the devs!!!!
+                string emailBody = "An unhandled exception was thrown in Data Retention Robot with ID : " + ConfigOptions.RobotId + Environment.NewLine + Environment.NewLine;
+                emailBody += "Message: " + e.Message + Environment.NewLine + Environment.NewLine;
+                emailBody += "Stack Trace: " + e.StackTrace + Environment.NewLine + Environment.NewLine;
+                MailFunctions.SendErrorEmail("DataRetentionRobot " + ConfigOptions.RobotId + " Unhandled Exception!!!", emailBody);
 
                 Environment.ExitCode = 1;
                 return 1;
@@ -64,10 +63,10 @@ namespace DataRetention.Robot.Test1
             return 0;
         }
 
-        static void CreateProductionProviders()
+        private static void CreateProductionProviders()
         {
-            _taskServer = new DummyTaskServer(RobotId);
-            _stagingServer = new DummyStagingServer(RobotId);
+            _taskServer = new DummyTaskServer(ConfigOptions.RobotId);
+            _stagingServer = new DummyStagingServer(ConfigOptions.RobotId);
             _entity1Provider = new DummyEntity1Provider();
             _entity2Provider = new DummyEntity2Provider();
         }
