@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataRetention.Core", "Core\DataRetention.Core.csproj", "{0CF1C2CD-5A27-4785-B1AB-A67B42F85406}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataRetention.Robot.Core", "DataRetention.Robot.Core\DataRetention.Robot.Core.csproj", "{545E93EB-B602-4D53-8CCA-DC6EF4284E98}"
@@ -12,28 +14,45 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataRetention.Robot.Test1",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataRetention.Robot.Server", "DataRetention.Robot.Server\DataRetention.Robot.Server.csproj", "{68CF7FF2-CCC6-40D4-AC78-55B13251635B}"
 EndProject
+Project("{159641D6-6404-4A2A-AE62-294DE0FE8301}") = "DataRetention.Databases.IntegrationServices", "DataRetention.Databases.IntegrationServices\DataRetention.Databases.IntegrationServices.dtproj", "{479A137B-9DD4-46B1-935D-2A1D49ACC729}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Development|Any CPU = Development|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{0CF1C2CD-5A27-4785-B1AB-A67B42F85406}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0CF1C2CD-5A27-4785-B1AB-A67B42F85406}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CF1C2CD-5A27-4785-B1AB-A67B42F85406}.Development|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CF1C2CD-5A27-4785-B1AB-A67B42F85406}.Development|Any CPU.Build.0 = Debug|Any CPU
 		{0CF1C2CD-5A27-4785-B1AB-A67B42F85406}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CF1C2CD-5A27-4785-B1AB-A67B42F85406}.Release|Any CPU.Build.0 = Release|Any CPU
 		{545E93EB-B602-4D53-8CCA-DC6EF4284E98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{545E93EB-B602-4D53-8CCA-DC6EF4284E98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{545E93EB-B602-4D53-8CCA-DC6EF4284E98}.Development|Any CPU.ActiveCfg = Debug|Any CPU
+		{545E93EB-B602-4D53-8CCA-DC6EF4284E98}.Development|Any CPU.Build.0 = Debug|Any CPU
 		{545E93EB-B602-4D53-8CCA-DC6EF4284E98}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{545E93EB-B602-4D53-8CCA-DC6EF4284E98}.Release|Any CPU.Build.0 = Release|Any CPU
 		{27280A98-B396-43DD-A581-01B7E172CE60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{27280A98-B396-43DD-A581-01B7E172CE60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27280A98-B396-43DD-A581-01B7E172CE60}.Development|Any CPU.ActiveCfg = Debug|Any CPU
+		{27280A98-B396-43DD-A581-01B7E172CE60}.Development|Any CPU.Build.0 = Debug|Any CPU
 		{27280A98-B396-43DD-A581-01B7E172CE60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27280A98-B396-43DD-A581-01B7E172CE60}.Release|Any CPU.Build.0 = Release|Any CPU
 		{68CF7FF2-CCC6-40D4-AC78-55B13251635B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{68CF7FF2-CCC6-40D4-AC78-55B13251635B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68CF7FF2-CCC6-40D4-AC78-55B13251635B}.Development|Any CPU.ActiveCfg = Debug|Any CPU
+		{68CF7FF2-CCC6-40D4-AC78-55B13251635B}.Development|Any CPU.Build.0 = Debug|Any CPU
 		{68CF7FF2-CCC6-40D4-AC78-55B13251635B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68CF7FF2-CCC6-40D4-AC78-55B13251635B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{479A137B-9DD4-46B1-935D-2A1D49ACC729}.Debug|Any CPU.ActiveCfg = Development
+		{479A137B-9DD4-46B1-935D-2A1D49ACC729}.Debug|Any CPU.Build.0 = Development
+		{479A137B-9DD4-46B1-935D-2A1D49ACC729}.Development|Any CPU.ActiveCfg = Development
+		{479A137B-9DD4-46B1-935D-2A1D49ACC729}.Development|Any CPU.Build.0 = Development
+		{479A137B-9DD4-46B1-935D-2A1D49ACC729}.Release|Any CPU.ActiveCfg = Development
+		{479A137B-9DD4-46B1-935D-2A1D49ACC729}.Release|Any CPU.Build.0 = Development
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
