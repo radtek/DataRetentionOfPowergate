@@ -11,42 +11,10 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="Customer"
   DTS:PackageType="5"
-  DTS:VersionBuild="1"
-  DTS:VersionGUID="{21F3F563-59CB-45C4-B5EB-53A2C9DAA080}">
+  DTS:VersionBuild="2"
+  DTS:VersionGUID="{6B217E48-C531-4316-8408-8B2FBB382618}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
-  <DTS:ConnectionManagers>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[192.168.88.21.genesis_user]"
-      DTS:CreationName="ADO.NET:MySql.Data.MySqlClient.MySqlConnection, MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d"
-      DTS:DTSID="{3FFA3DFC-69AB-4326-8D9C-C4CA875C5B3B}"
-      DTS:ObjectName="192.168.88.21.genesis_user">
-      <DTS:ObjectData>
-        <DTS:ConnectionManager
-          DTS:ConnectionString="server=192.168.88.21;user id=genesis_user;port=3306;persistsecurityinfo=True;cacheserverproperties=True;database=usage-rrd-dev;">
-          <DTS:Password
-            DTS:Name="password"
-            Sensitive="1"
-            Encrypted="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAANFxBWtf4gUm3Wey00OS5RwAAAAAIAAAARABUAFMAAAAQZgAAAAEAACAAAADiQxbqIp+dzxPZY1WKbhZ/bGKOu9peW+/EX0ituAyyWAAAAAAOgAAAAAIAACAAAADPByj3GBUhpg1nyv3YjQWW4EbOl31jmrcDDLBBUtd48xAAAABl6chg8Bn9zyHoDJd9MftyQAAAAGpvcHsNF5A7n2RARrP8YS2zIHoL/xo+T2obeLSG0F1rmIY5ntJrncHxtnYYYqSmyTCeConyoOdn7fKjWhrMhG0</DTS:Password>
-        </DTS:ConnectionManager>
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[64.150.189.45.DataRetentionStaging.powergate]"
-      DTS:CreationName="ADO.NET:System.Data.SqlClient.SqlConnection, System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-      DTS:DTSID="{FFDC2BC4-6765-471D-96B0-8721486000FA}"
-      DTS:ObjectName="64.150.189.45.DataRetentionStaging.powergate">
-      <DTS:ObjectData>
-        <DTS:ConnectionManager
-          DTS:ConnectionString="Data Source=64.150.189.45;User ID=powergate;Initial Catalog=DataRetentionStaging;Persist Security Info=True;Application Name=SSIS-Package-{FFDC2BC4-6765-471D-96B0-8721486000FA}64.150.189.45.DataRetentionStaging.powergate;">
-          <DTS:Password
-            DTS:Name="Password"
-            Sensitive="1"
-            Encrypted="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAANFxBWtf4gUm3Wey00OS5RwAAAAAIAAAARABUAFMAAAAQZgAAAAEAACAAAAAMfzu1CRJFBc5VNVmBy/Qe0dagy55LvHPFavq4cqm6zgAAAAAOgAAAAAIAACAAAAB7uGp0+OrxHlejDhzMC56EFDItgERZofWlPBn57bvahSAAAADZEQzkGqQU7Onbe+toJzJ1FQTPdYbpGHTDdv7U/V1aTEAAAAD5CRJAO/m11JJwoIXfUSd6w8zZpIQJufLyPl/zMjyyg51pE+B4zwZyo4j+Cf1NWY+3zVnQatFGDN1edaCVdbF3</DTS:Password>
-        </DTS:ConnectionManager>
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
-  </DTS:ConnectionManagers>
   <DTS:Variables />
   <DTS:Executables>
     <DTS:Executable
@@ -99,8 +67,8 @@
               <connections>
                 <connection
                   refId="Package\Data Flow Task\Data Retention Customer.Connections[IDbConnection]"
-                  connectionManagerID="Package.ConnectionManagers[64.150.189.45.DataRetentionStaging.powergate]"
-                  connectionManagerRefId="Package.ConnectionManagers[64.150.189.45.DataRetentionStaging.powergate]"
+                  connectionManagerID="{FFDC2BC4-6765-471D-96B0-8721486000FA}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[64.150.189.45.DataRetentionStaging.powergate]"
                   description="Managed connection manager"
                   name="IDbConnection" />
               </connections>
@@ -316,8 +284,8 @@
               <connections>
                 <connection
                   refId="Package\Data Flow Task\Genesis Customer.Connections[IDbConnection]"
-                  connectionManagerID="Package.ConnectionManagers[192.168.88.21.genesis_user]"
-                  connectionManagerRefId="Package.ConnectionManagers[192.168.88.21.genesis_user]"
+                  connectionManagerID="{3FFA3DFC-69AB-4326-8D9C-C4CA875C5B3B}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[192.168.88.21.genesis_user]"
                   description="Managed connection manager"
                   name="IDbConnection" />
               </connections>
@@ -3639,7 +3607,7 @@
     </LayoutInfo>
   </TaskHost>
   <PipelineComponentMetadata
-    design-time-name="Package\Data Flow Task\Genesis Customer">
+    design-time-name="Package\Data Flow Task\Data Retention Customer">
     <Properties>
       <Property>
         <Name>DataSourceViewID</Name>
@@ -3647,7 +3615,7 @@
     </Properties>
   </PipelineComponentMetadata>
   <PipelineComponentMetadata
-    design-time-name="Package\Data Flow Task\Data Retention Customer">
+    design-time-name="Package\Data Flow Task\Genesis Customer">
     <Properties>
       <Property>
         <Name>DataSourceViewID</Name>

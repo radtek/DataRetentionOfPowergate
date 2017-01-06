@@ -1,0 +1,14 @@
+﻿<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="genesis_user"
+  DTS:DTSID="{3FFA3DFC-69AB-4326-8D9C-C4CA875C5B3B}"
+  DTS:CreationName="ADO.NET:MySql.Data.MySqlClient.MySqlConnection, MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectionString="server=192.168.88.21;user id=genesis_user;port=3306;persistsecurityinfo=True;cacheserverproperties=True;database=usage-rrd-dev;">
+      <DTS:Password
+        DTS:Name="password"
+        Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAANFxBWtf4gUm3Wey00OS5RwAAAAACAAAAAAAQZgAAAAEAACAAAACvTKD1QSFt9xA81PQbvE3NwTYCQQqVU3RDA130mKFNQgAAAAAOgAAAAAIAACAAAAAYmoXXVge2Ywc9x1q+sxXpA/xWRgMV0u3p3q8foB2P7YAAAAAZHs0Zsb+pf5/rfwS8L+KdF0A9zkuc0R5bQ5eCit9RZkJUewOsZK9eS+cre93eELeeC8c/Q2jjnnTX3um1p8dzabD9Jc0ZLvbAmw+046K0NAjA4i4YcMrqF7aboyTYgmyeEjtuIdM9NylK8RJY/JtbZFPSxFhJzsbXILCBplIYwkAAAADrEME1FieIyK6cd0y/MSOabaIHBNlZfRp5riob0/QsVshNYXlc1TlcFTy/X0i41fbOyEqUJjdAupD3fjjyKmVI</DTS:Password>
+    </DTS:ConnectionManager>
+  </DTS:ObjectData>
+</DTS:ConnectionManager>

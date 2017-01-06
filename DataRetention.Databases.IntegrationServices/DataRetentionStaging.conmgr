@@ -1,0 +1,14 @@
+﻿<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="DataRetentionStaging"
+  DTS:DTSID="{FFDC2BC4-6765-471D-96B0-8721486000FA}"
+  DTS:CreationName="ADO.NET:System.Data.SqlClient.SqlConnection, System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectionString="Data Source=64.150.189.45;User ID=powergate;Initial Catalog=DataRetentionStaging;Persist Security Info=True;Application Name=SSIS-Package-{FFDC2BC4-6765-471D-96B0-8721486000FA}64.150.189.45.DataRetentionStaging.powergate;">
+      <DTS:Password
+        DTS:Name="Password"
+        Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAANFxBWtf4gUm3Wey00OS5RwAAAAACAAAAAAAQZgAAAAEAACAAAABar63aumWc5yLlu6Dj/ajF6u6lVRK/qKiZWrUBUNLkmgAAAAAOgAAAAAIAACAAAAANaCzLGrMTwlaWkyyw56e83SXi7Zj3FJrpSBrVE+zccYAAAABiEIJCPETPGPBBH2QX+gJqGhuYamH66AtMmZLT0QLPWCPYY8JflX8D9uwb35nhtj0h4h5PmJlfk4x8uSFkOb9lW89mwvFpwv7OgJ3yFfZwLH1JSHow3fQkPyMqhnDo/UfiurQhnJNiNjjnxCwScCBfIdnens62TooEWeU5eZPDqkAAAABhdZ/ZPiq9OdbqWJf261mstGoV3owFrBjo2+MLjApxoOO/P+suoiJzfhuWGqXd3xpHCIcn1W2FRpsCFbz3iO6d</DTS:Password>
+    </DTS:ConnectionManager>
+  </DTS:ObjectData>
+</DTS:ConnectionManager>
