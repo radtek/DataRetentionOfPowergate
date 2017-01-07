@@ -5,10 +5,10 @@
   DTS:CreationName="ADO.NET:MySql.Data.MySqlClient.MySqlConnection, MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d">
   <DTS:ObjectData>
     <DTS:ConnectionManager
-      DTS:ConnectionString="server=192.168.88.21;user id=genesis_user;port=3306;persistsecurityinfo=True;cacheserverproperties=True;database=usage-rrd-dev;">
+      DTS:ConnectionString="server=192.168.88.21;user id=genesis_user;port=3306;persistsecurityinfo=True;cacheserverproperties=True;database=usage-rrd-dev;convertzerodatetime=True;allowbatch=True;">
       <DTS:Password
         DTS:Name="password"
-        Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAANFxBWtf4gUm3Wey00OS5RwAAAAACAAAAAAAQZgAAAAEAACAAAABhk1SBuDmYTFFxd5IyC1LH3Yq92NVTsLoH5oZLWwpPRQAAAAAOgAAAAAIAACAAAAApUqkgniv5fXqq1K6jCW4drjH0XUOik2tjQMVWCb62Q4AAAADewZeCkJFKiIFbnKXCxkiZ2rv381uA0lcQVKr7+2+L3tLYof2wxMzzEI3EccQGqGCxf+ckZ/vQmxV1vL361Wx7dsD7JJTE1SbTQtIWoJOzW/+WKFWiTyLoS2i3kyn7izdQAzL+5uqbGEvcUUAiwKtW1LanEum1voUYkBUy9/2yakAAAAATtuRaG4QME/l6dsem05jAz5CXDzV1QFhjZlA+T/LJ04U35Zrjg4XxGq66qyokfOjJ1/0KWl/SY2UOe2wJgzhx</DTS:Password>
+        Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAANFxBWtf4gUm3Wey00OS5RwAAAAACAAAAAAAQZgAAAAEAACAAAABlNq1+DT93d5YgeHlWuIDxTuNcfh2h9lgYNy11z9OOqgAAAAAOgAAAAAIAACAAAADvCYu2EuLFNXHYkuXiQmU7PZFSnjVhLM0UKIsezvM2goAAAABecGHK5tnHDwOICdGPB2K6lR1um7SmPMKKyBQGaA3mo57XnKgAHDpA3tVcOTHXg2bWbuAwU05HiG8Er/TgfrFnElRNhV71Nf4XV9QHzGMkcVDAYwU7/s7ReAhXfEMpY53Hl7K/hks0Qlkkiod/Wu/IA07S2PKuLlv0DXBj7kA670AAAADliy9ll6Fx86jMN12jx+BhBBXLeBkfZCsqXiEEu01R8jcWrTXBtZ8lj3aO7AKsktqOiP250E6utHszhqelgw5H</DTS:Password>
     </DTS:ConnectionManager>
   </DTS:ObjectData>
 </DTS:ConnectionManager>
