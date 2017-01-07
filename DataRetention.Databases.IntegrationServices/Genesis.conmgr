@@ -8,7 +8,7 @@
       DTS:ConnectionString="server=192.168.88.21;user id=genesis_user;port=3306;persistsecurityinfo=True;cacheserverproperties=True;database=usage-rrd-dev;">
       <DTS:Password
         DTS:Name="password"
-        Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAANFxBWtf4gUm3Wey00OS5RwAAAAACAAAAAAAQZgAAAAEAACAAAAB3FBsxZ7d5mwxZ+k2GJicNGERv8xFgULTp+wYBq1XL+QAAAAAOgAAAAAIAACAAAADI5Y/dHxiB7s7IDgBjWj0U1urx6xGhVv/bIRACuV5NVIAAAADEBCf5tcnr7lgAPCYinJz6VrJSIuJ2BTkY+m8pEfhdKNOqgVC2H4JOdsNfpIv3aqfmylKXwQBQGNWcc1Q2ArY76niHJx03PxOg0Fl0bWmd210RfTKrECHmNoQkciB1EuuWeljsTmFUCMmoG1xXJuB1/RGby+hDigN4pEDJ/jmk5UAAAACzlQXmBaCFwPZ1f5sQ6rNyNDFgAhuCnf9GBcMUO38o59U8Xl6oAe8pDZglQeOxQn3jV2isadW0ir8p8xxS3ptI</DTS:Password>
+        Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAANFxBWtf4gUm3Wey00OS5RwAAAAACAAAAAAAQZgAAAAEAACAAAABhk1SBuDmYTFFxd5IyC1LH3Yq92NVTsLoH5oZLWwpPRQAAAAAOgAAAAAIAACAAAAApUqkgniv5fXqq1K6jCW4drjH0XUOik2tjQMVWCb62Q4AAAADewZeCkJFKiIFbnKXCxkiZ2rv381uA0lcQVKr7+2+L3tLYof2wxMzzEI3EccQGqGCxf+ckZ/vQmxV1vL361Wx7dsD7JJTE1SbTQtIWoJOzW/+WKFWiTyLoS2i3kyn7izdQAzL+5uqbGEvcUUAiwKtW1LanEum1voUYkBUy9/2yakAAAAATtuRaG4QME/l6dsem05jAz5CXDzV1QFhjZlA+T/LJ04U35Zrjg4XxGq66qyokfOjJ1/0KWl/SY2UOe2wJgzhx</DTS:Password>
     </DTS:ConnectionManager>
   </DTS:ObjectData>
 </DTS:ConnectionManager>
